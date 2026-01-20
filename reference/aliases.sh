@@ -62,7 +62,7 @@ alias aws-ssm-list='aws ssm describe-parameters --region $PIPELINE_REGION --filt
 
 alias aws-ssm-age='aws ssm describe-parameters --region $PIPELINE_REGION --filters "Key=Name,Values=/editorbot/" --query "Parameters[*].[Name,LastModifiedDate]" --output table'
 
-alias aws-ssh='aws ssm start-session --target $(cd $PIPELINE_ROOT/aws-content-pipeline && terraform output -raw instance_id) --region $PIPELINE_REGION'
+alias aws-ssh='aws ssm start-session --target $(cd $PIPELINE_ROOT/aws-content-pipeline && terraform output -raw control_vm_instance_id) --region $PIPELINE_REGION'
 
 # =============================================================================
 # GitHub Actions Aliases
@@ -81,17 +81,17 @@ alias gh-deploy='gh workflow run deploy.yml --repo macizomedia/editorbot-stack'
 # Git Aliases
 # =============================================================================
 alias git-status-all='
-  echo "=== aws-content-pipeline ===" && 
-  cd $PIPELINE_ROOT/aws-content-pipeline && git status -sb && 
-  echo "\n=== editorbot-stack ===" && 
-  cd $PIPELINE_ROOT/editorbot-stack && git status -sb && 
-  echo "\n=== content-pipeline-docs ===" && 
+  echo "=== aws-content-pipeline ===" &&
+  cd $PIPELINE_ROOT/aws-content-pipeline && git status -sb &&
+  echo "\n=== editorbot-stack ===" &&
+  cd $PIPELINE_ROOT/editorbot-stack && git status -sb &&
+  echo "\n=== content-pipeline-docs ===" &&
   cd $PIPELINE_ROOT/content-pipeline-docs && git status -sb
 '
 
 alias git-pull-all='
-  cd $PIPELINE_ROOT/aws-content-pipeline && git pull && 
-  cd $PIPELINE_ROOT/editorbot-stack && git pull && 
+  cd $PIPELINE_ROOT/aws-content-pipeline && git pull &&
+  cd $PIPELINE_ROOT/editorbot-stack && git pull &&
   cd $PIPELINE_ROOT/content-pipeline-docs && git pull
 '
 
@@ -99,13 +99,13 @@ alias git-pull-all='
 # Quick Health Check
 # =============================================================================
 alias pipeline-health='
-  echo "=== Terraform State ===" && 
-  cd $PIPELINE_ROOT/aws-content-pipeline && 
-  terraform output -json | jq -r "{instance_id, bucket_name, region}" && 
-  echo "\n=== AWS Instance ===" && 
-  INSTANCE_ID=$(terraform output -raw instance_id) && 
-  aws ec2 describe-instances --region $PIPELINE_REGION --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].[State.Name,InstanceType]" --output text && 
-  echo "\n=== Recent Logs (last 5 lines) ===" && 
+  echo "=== Terraform State ===" &&
+  cd $PIPELINE_ROOT/aws-content-pipeline &&
+  terraform output -json | jq -r "{instance_id: .control_vm_instance_id.value, bucket_name: .content_bucket_name.value, public_ip: .control_vm_public_ip.value}" &&
+  echo "\n=== AWS Instance ===" &&
+  INSTANCE_ID=$(terraform output -raw control_vm_instance_id) &&
+  aws ec2 describe-instances --region $PIPELINE_REGION --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].[State.Name,InstanceType]" --output text &&
+  echo "\n=== Recent Logs (last 5 lines) ===" &&
   aws logs tail /content-pipeline/editorbot --since 5m --region $PIPELINE_REGION 2>/dev/null | tail -5 || echo "No recent logs"
 '
 
@@ -125,7 +125,7 @@ alias pipeline-status='
 
 # Get instance ID from Terraform
 pipeline-instance-id() {
-  cd $PIPELINE_ROOT/aws-content-pipeline && terraform output -raw instance_id
+  cd $PIPELINE_ROOT/aws-content-pipeline && terraform output -raw control_vm_instance_id
 }
 
 # Get S3 bucket name
