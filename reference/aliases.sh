@@ -17,6 +17,7 @@ alias tf-output='cd $PIPELINE_ROOT/aws-content-pipeline && terraform output'
 alias tf-plan='cd $PIPELINE_ROOT/aws-content-pipeline && terraform plan'
 alias tf-refresh='cd $PIPELINE_ROOT/aws-content-pipeline && terraform refresh'
 alias tf-validate='cd $PIPELINE_ROOT/aws-content-pipeline && terraform validate'
+alias tf-destroy='cd $PIPELINE_ROOT/aws-content-pipeline && terraform destroy'
 
 # =============================================================================
 # AWS EC2 Aliases
@@ -63,6 +64,25 @@ alias aws-ssm-list='aws ssm describe-parameters --region $PIPELINE_REGION --filt
 alias aws-ssm-age='aws ssm describe-parameters --region $PIPELINE_REGION --filters "Key=Name,Values=/editorbot/" --query "Parameters[*].[Name,LastModifiedDate]" --output table'
 
 alias aws-ssh='aws ssm start-session --target $(cd $PIPELINE_ROOT/aws-content-pipeline && terraform output -raw control_vm_instance_id) --region $PIPELINE_REGION'
+
+# Get SSM Run Command logs by command ID
+aws-ssm-logs() {
+  if [ -z "$1" ]; then
+    echo "Usage: aws-ssm-logs <command-id>"
+    echo "Example: aws-ssm-logs c7cea4db-a1fc-463b-8f45-0f2e6b8a736a"
+    return 1
+  fi
+  INSTANCE_ID=$(cd $PIPELINE_ROOT/aws-content-pipeline && terraform output -raw control_vm_instance_id)
+  echo "Fetching logs for command: $1"
+  echo "Instance: $INSTANCE_ID"
+  echo ""
+  aws ssm get-command-invocation \
+    --command-id "$1" \
+    --instance-id "$INSTANCE_ID" \
+    --region $PIPELINE_REGION \
+    --query '{Status: Status, StatusDetails: StatusDetails, StandardOutput: StandardOutputContent, StandardError: StandardErrorContent}' \
+    --output json | jq -r '.'
+}
 
 # =============================================================================
 # GitHub Actions Aliases
