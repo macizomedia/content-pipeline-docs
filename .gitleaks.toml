@@ -1,0 +1,48 @@
+# Gitleaks Configuration
+# Place in repo root as .gitleaks.toml
+
+title = "Content Pipeline Secret Detection"
+
+[extend]
+# Use default rules
+useDefault = true
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["key", "AWS"]
+
+[[rules]]
+id = "gemini-api-key"
+description = "Google Gemini API Key"
+regex = '''AIza[0-9A-Za-z\-_]{35}'''
+tags = ["key", "Google"]
+
+[[rules]]
+id = "telegram-bot-token"
+description = "Telegram Bot Token"
+regex = '''[0-9]{8,10}:[a-zA-Z0-9_-]{35}'''
+tags = ["key", "Telegram"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'''
+tags = ["key", "private"]
+
+[allowlist]
+description = "Allowlist for non-sensitive patterns"
+paths = [
+    '''\.gitignore$''',
+    '''\.gitleaks\.toml$''',
+    '''README\.md$''',
+]
+
+# Allow dummy/example values
+regexes = [
+    '''dummy''',
+    '''REDACTED''',
+    '''your-key-here''',
+    '''example\.com''',
+]

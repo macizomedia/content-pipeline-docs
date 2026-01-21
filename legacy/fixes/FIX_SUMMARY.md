@@ -9,7 +9,7 @@ Your EditorBot project has been **completely evaluated and fixed** for safe depl
 ## 🔴 Critical Issues Fixed (Blocking)
 
 ### 1. **EXPOSED API KEY**
-- **Before:** `llm=OpenAIClient(api_key=os.environ["AIzaSyD_FkvMurPpk1GWL_HL9WEiSWOvOSwlzJo"])`
+- **Before:** `llm=OpenAIClient(api_key=os.environ["REDACTED_API_KEY"])`
 - **After:** Reads from `GEMINI_API_KEY` environment variable with validation
 - **File:** `editorBot/bot/services/mediation.py`
 
