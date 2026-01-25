@@ -1,0 +1,33 @@
+{
+  "id": "storytelling_template",
+  "name": "Storytelling Template",
+  "description": "A dynamic template with a beginning, middle, and end, ideal for short-form storytelling on Reels or TikTok.",
+  "allowed_formats": [
+    "Reel",
+    "TikTok"
+  ],
+  "duration_min_seconds": 30,
+  "duration_max_seconds": 60,
+  "script_structure": {
+    "min_beats": 3,
+    "max_beats": 7,
+    "required_roles": [
+      "Narrator"
+    ],
+    "optional_roles": [
+      "Character"
+    ],
+    "forbidden_roles": []
+  },
+  "audio_rules": {
+    "voice_required": true,
+    "music_allowed": true,
+    "silence_tolerance_seconds": 2
+  },
+  "visual_rules": {
+    "min_scenes": 3,
+    "max_scenes": 8,
+    "static_images_allowed": true,
+    "text_overlay_required": false
+  }
+}
